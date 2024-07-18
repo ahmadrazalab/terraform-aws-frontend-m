@@ -96,6 +96,7 @@ resource "aws_instance" "app" {
   key_name        = aws_key_pair.api-key-aws.api-key-aws
   subnet_id       = element(var.subnet_ids, count.index % length(var.subnet_ids))
   security_groups = [aws_security_group.ec2_sg.id]
+  user_data = file("./user-data.sh")    # user data file
 
   tags = {
     Name = "app-primary-instance-${count.index + 1}"
@@ -108,6 +109,7 @@ resource "aws_instance" "tg2" {
   key_name        = aws_key_pair.api-key-aws.api-key-aws
   subnet_id       = element(var.subnet_ids, 0)
   security_groups = [aws_security_group.ec2_sg.id]
+  user_data = file("./user-data.sh")    # user data file
 
   tags = {
     Name = "app-seconday-instance-tg2"
@@ -143,7 +145,7 @@ resource "aws_lb_target_group" "tg1" {
   }
 }
 
-resource "aws_lb_target_group" "app-tg2" {
+resource "aws_lb_target_group" "tg2" {
   name     = "app-tg2"
   port     = 80
   protocol = "HTTP"
