@@ -1,7 +1,7 @@
 # aws key pair
 resource "aws_key_pair" "api-key-aws" {
-  key_name = "api-key-aws"
-  public_key = ./id_rsa.pub  
+  key_name   = "api-key-aws"
+  public_key = id_rsa.pub
 }
 
 
@@ -90,11 +90,11 @@ resource "aws_security_group" "rds_sg" {
 
 # Create EC2 instances
 resource "aws_instance" "app" {
-  count         = 1
-  ami           = var.ami_id
-  instance_type = var.instance_type
-  key_name      = aws_key_pair.api-key-aws.api-key-aws
-  subnet_id     = element(var.subnet_ids, count.index % length(var.subnet_ids))
+  count           = 1
+  ami             = var.ami_id
+  instance_type   = var.instance_type
+  key_name        = aws_key_pair.api-key-aws.api-key-aws
+  subnet_id       = element(var.subnet_ids, count.index % length(var.subnet_ids))
   security_groups = [aws_security_group.ec2_sg.id]
 
   tags = {
@@ -103,10 +103,10 @@ resource "aws_instance" "app" {
 }
 
 resource "aws_instance" "tg2" {
-  ami           = var.ami_id
-  instance_type = var.instance_type
-  key_name      = aws_key_pair.api-key-aws.api-key-aws
-  subnet_id     = element(var.subnet_ids, 0)
+  ami             = var.ami_id
+  instance_type   = var.instance_type
+  key_name        = aws_key_pair.api-key-aws.api-key-aws
+  subnet_id       = element(var.subnet_ids, 0)
   security_groups = [aws_security_group.ec2_sg.id]
 
   tags = {
@@ -189,12 +189,12 @@ resource "aws_lb_listener" "https" {
 
     forward {
       target_group {
-        arn   = aws_lb_target_group.tg1.arn
+        arn    = aws_lb_target_group.tg1.arn
         weight = 50
       }
 
       target_group {
-        arn   = aws_lb_target_group.tg2.arn
+        arn    = aws_lb_target_group.tg2.arn
         weight = 50
       }
     }
@@ -218,11 +218,11 @@ resource "aws_lb_target_group_attachment" "tg2_attachment" {
 
 # Create Auto Scaling Group for tg1
 resource "aws_autoscaling_group" "asg" {
-  desired_capacity     = 2
-  max_size             = 5
-  min_size             = 1
-  vpc_zone_identifier  = var.subnet_ids
-  target_group_arns    = [aws_lb_target_group.tg1.arn]
+  desired_capacity    = 2
+  max_size            = 5
+  min_size            = 1
+  vpc_zone_identifier = var.subnet_ids
+  target_group_arns   = [aws_lb_target_group.tg1.arn]
 
   launch_configuration = aws_launch_configuration.lc.id
 
@@ -236,38 +236,41 @@ resource "aws_autoscaling_group" "asg" {
 
 # creating launch template for asg
 resource "aws_launch_configuration" "lc" {
-  name          = "app-nest-configuration"
-  image_id      = var.ami_id
-  instance_type = var.instance_type
+  name            = "app-nest-configuration"
+  image_id        = var.ami_id
+  instance_type   = var.instance_type
   security_groups = [aws_security_group.ec2_sg.id]
 }
 
 
 resource "aws_launch_template" "lt" {
-  name = "app-nest-template"
-  image_id = var.ami_id
-  instance_type = var.instance_type
+  name                 = "app-nest-template"
+  image_id             = var.ami_id
+  instance_type        = var.instance_type
   security_group_names = [aws_security_group.ec2_sg.id]
-  key_name = nest-app-key
+  key_name             = "api-key-aws"
 
-  
+  lifecycle {
+    create_before_destroy = true
+  }
+
 }
 
 resource "aws_db_instance" "default" {
-  identifier           = "app-db-nest" # Set your DB identifier here
-  allocated_storage    = 20
-  max_allocated_storage = 100
-  engine               = "mysql"
-  engine_version       = "8.0"
-  instance_class       = "db.t3.micro"
-  username             = "admin"
-  password             = "password"
-  parameter_group_name = "default.mysql8.0"
-  skip_final_snapshot  = true
-  publicly_accessible  = false
-  deletion_protection = false # normally its true
+  identifier             = "app-db-nest" # Set your DB identifier here
+  allocated_storage      = 20
+  max_allocated_storage  = 100
+  engine                 = "mysql"
+  engine_version         = "8.0"
+  instance_class         = "db.t3.micro"
+  username               = "admin"
+  password               = "password"
+  parameter_group_name   = "default.mysql8.0"
+  skip_final_snapshot    = true
+  publicly_accessible    = false
+  deletion_protection    = false # normally its true
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
-  db_subnet_group_name = aws_db_subnet_group.main.name
+  db_subnet_group_name   = aws_db_subnet_group.main.name
 
   tags = {
     Name = "app-db-nest"
