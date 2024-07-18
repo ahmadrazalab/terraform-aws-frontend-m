@@ -218,6 +218,22 @@ resource "aws_lb_target_group_attachment" "tg2_attachment" {
   port             = 80
 }
 
+
+# Create launch template for application instances ami 
+resource "aws_launch_template" "lt" {
+  name                 = "app-nest-l-template"
+  image_id             = var.ami_id
+  instance_type        = var.instance_type
+  vpc_security_group_ids = [ aws_security_group.ec2_sg.id ]
+  key_name             = "api-key-aws"
+
+  lifecycle {
+    create_before_destroy = true
+  }
+}
+
+
+
 # Create Auto Scaling Group for tg1
 resource "aws_autoscaling_group" "asg" {
   name = "nest-app-asg"
@@ -226,8 +242,10 @@ resource "aws_autoscaling_group" "asg" {
   min_size            = 1
   vpc_zone_identifier = var.subnet_ids
   target_group_arns   = [aws_lb_target_group.tg1.arn]
-
-  launch_configuration = aws_launch_template.lt.id
+  launch_template {
+    id      = aws_launch_template.lt.id
+    version = "$Latest"
+  }
 
   tag {
     key                 = "Name"
@@ -236,29 +254,7 @@ resource "aws_autoscaling_group" "asg" {
   }
 }
 
-
-# # creating launch template for asg
-# resource "aws_launch_configuration" "lc" {
-#   name            = "app-nest-configuration"
-#   image_id        = var.ami_id
-#   instance_type   = var.instance_type
-#   security_groups = [aws_security_group.ec2_sg.id]
-# }
-
-
-resource "aws_launch_template" "lt" {
-  name                 = "app-nest-l-template"
-  image_id             = var.ami_id
-  instance_type        = var.instance_type
-  security_group_names = [aws_security_group.ec2_sg.id]
-  key_name             = "api-key-aws"
-
-  lifecycle {
-    create_before_destroy = true
-  }
-
-}
-
+# mysql database 
 resource "aws_db_instance" "default" {
   identifier             = "app-db-nest" # Set your DB identifier here
   allocated_storage      = 20
