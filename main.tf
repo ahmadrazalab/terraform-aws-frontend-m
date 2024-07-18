@@ -1,41 +1,9 @@
-# # provider find the creds in aws cli dir with the vesion specific terraform 
-terraform {
-  required_version = "v1.9.2"
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "3.0"
-  
-  }
-}
+# aws key pair
+resource "aws_key_pair" "api-key-aws" {
+  key_name = "api-key-aws"
+  public_key = ./id_rsa.pub  
 }
 
-# Configure the AWS Provider cli with region hard code 
-provider "aws" {
-  region = "us-east-1"
-}
-
-# Variables
-variable "ami_id" {
-  default = "ami-0a0e5d9c7acc336f1"
-  description = "The AMI ID for the EC2 instances"
-}
-
-variable "instance_type" {
-  description = "The instance type for the EC2 instances"
-  default     = "t2.micro"
-}
-
-variable "vpc_id" {
-  default = "vpc-0383716a205757a78"
-  description = "The VPC ID"
-}
-
-variable "subnet_ids" {
-  description = "A list of subnet IDs"
-  type        = list(string)
-  default = [ "subnet-088b163111abca9e8", "subnet-014c505f127ee9a23", "subnet-0f40021676c987d5e", "subnet-0e2a5c6f1397b1ab0", "subnet-0f879dd6e0b9508d2", "subnet-078dd16ae97c3a3ec" ]
-}
 
 # Create Security Groups
 resource "aws_security_group" "alb_sg" {
@@ -71,11 +39,19 @@ resource "aws_security_group" "ec2_sg" {
   vpc_id      = var.vpc_id
 
   ingress {
+    from_port       = 22
+    to_port         = 22
+    protocol        = "tcp"
+    security_groups = [aws_security_group.alb_sg.id]
+  }
+
+  ingress {
     from_port       = 80
     to_port         = 80
     protocol        = "tcp"
     security_groups = [aws_security_group.alb_sg.id]
   }
+
 
   ingress {
     from_port       = 443
@@ -114,25 +90,27 @@ resource "aws_security_group" "rds_sg" {
 
 # Create EC2 instances
 resource "aws_instance" "app" {
-  count         = 3
+  count         = 1
   ami           = var.ami_id
   instance_type = var.instance_type
+  key_name      = aws_key_pair.api-key-aws.api-key-aws
   subnet_id     = element(var.subnet_ids, count.index % length(var.subnet_ids))
   security_groups = [aws_security_group.ec2_sg.id]
 
   tags = {
-    Name = "app-instance-${count.index + 1}"
+    Name = "app-primary-instance-${count.index + 1}"
   }
 }
 
-resource "aws_instance" "app_tg2" {
+resource "aws_instance" "tg2" {
   ami           = var.ami_id
   instance_type = var.instance_type
+  key_name      = aws_key_pair.api-key-aws.api-key-aws
   subnet_id     = element(var.subnet_ids, 0)
   security_groups = [aws_security_group.ec2_sg.id]
 
   tags = {
-    Name = "app-instance-tg2"
+    Name = "app-seconday-instance-tg2"
   }
 }
 
@@ -148,7 +126,7 @@ resource "aws_lb" "app_lb" {
 }
 
 resource "aws_lb_target_group" "tg1" {
-  name     = "tg1"
+  name     = "app-tg1"
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -165,8 +143,8 @@ resource "aws_lb_target_group" "tg1" {
   }
 }
 
-resource "aws_lb_target_group" "tg2" {
-  name     = "tg2"
+resource "aws_lb_target_group" "app-tg2" {
+  name     = "app-tg2"
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -255,34 +233,30 @@ resource "aws_autoscaling_group" "asg" {
   }
 }
 
+
+# creating launch template for asg
 resource "aws_launch_configuration" "lc" {
-  name          = "launch-configuration"
+  name          = "app-nest-configuration"
   image_id      = var.ami_id
   instance_type = var.instance_type
   security_groups = [aws_security_group.ec2_sg.id]
 }
 
-# # Create RDS instance
-# resource "aws_db_instance" "default" {
-#   allocated_storage    = 20
-#   max_allocated_storage = 100   # enable storage autoscaling 
-#   storage_type         = "gp2"
-#   engine               = "mysql"
-#   engine_version       = "8.0"
-#   instance_class       = "db.t2.micro"
-#   # db_name              = "mydb-m"
-#   username             = "admin"
-#   password             = "password" # Change this to your preferred password
-#   parameter_group_name = "default.mysql8.0"
-#   skip_final_snapshot  = true
-#   publicly_accessible  = false
-#   vpc_security_group_ids = [aws_security_group.rds_sg.id]
-#   db_subnet_group_name = aws_db_subnet_group.main.name
-# }
 
+resource "aws_launch_template" "lt" {
+  name = "app-nest-template"
+  image_id = var.ami_id
+  instance_type = var.instance_type
+  security_group_names = [aws_security_group.ec2_sg.id]
+  key_name = nest-app-key
+
+  
+}
 
 resource "aws_db_instance" "default" {
-  allocated_storage    = 10
+  identifier           = "app-db-nest" # Set your DB identifier here
+  allocated_storage    = 20
+  max_allocated_storage = 100
   engine               = "mysql"
   engine_version       = "8.0"
   instance_class       = "db.t3.micro"
@@ -290,9 +264,14 @@ resource "aws_db_instance" "default" {
   password             = "password"
   parameter_group_name = "default.mysql8.0"
   skip_final_snapshot  = true
-  # publicly_accessible  = false
+  publicly_accessible  = false
+  deletion_protection = false # normally its true
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   db_subnet_group_name = aws_db_subnet_group.main.name
+
+  tags = {
+    Name = "app-db-nest"
+  }
 
 }
 
@@ -302,7 +281,7 @@ resource "aws_db_subnet_group" "main" {
   subnet_ids = var.subnet_ids
 
   tags = {
-    Name = "main"
+    Name = "aws_db_subnet_group"
   }
 }
 
