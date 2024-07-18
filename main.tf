@@ -1,7 +1,7 @@
 # aws key pair
 resource "aws_key_pair" "api-key-aws" {
   key_name   = "api-key-aws"
-  public_key = "./resources/id_rsa.pub"
+  public_key = file("./resources/id_rsa.pub")
 }
 
 
@@ -220,13 +220,14 @@ resource "aws_lb_target_group_attachment" "tg2_attachment" {
 
 # Create Auto Scaling Group for tg1
 resource "aws_autoscaling_group" "asg" {
-  desired_capacity    = 2
+  name = "nest-app-asg"
+  desired_capacity    = 1
   max_size            = 5
   min_size            = 1
   vpc_zone_identifier = var.subnet_ids
   target_group_arns   = [aws_lb_target_group.tg1.arn]
 
-  launch_configuration = aws_launch_configuration.lc.id
+  launch_configuration = aws_launch_template.lt.id
 
   tag {
     key                 = "Name"
@@ -236,17 +237,17 @@ resource "aws_autoscaling_group" "asg" {
 }
 
 
-# creating launch template for asg
-resource "aws_launch_configuration" "lc" {
-  name            = "app-nest-configuration"
-  image_id        = var.ami_id
-  instance_type   = var.instance_type
-  security_groups = [aws_security_group.ec2_sg.id]
-}
+# # creating launch template for asg
+# resource "aws_launch_configuration" "lc" {
+#   name            = "app-nest-configuration"
+#   image_id        = var.ami_id
+#   instance_type   = var.instance_type
+#   security_groups = [aws_security_group.ec2_sg.id]
+# }
 
 
 resource "aws_launch_template" "lt" {
-  name                 = "app-nest-template"
+  name                 = "app-nest-l-template"
   image_id             = var.ami_id
   instance_type        = var.instance_type
   security_group_names = [aws_security_group.ec2_sg.id]
@@ -264,7 +265,7 @@ resource "aws_db_instance" "default" {
   max_allocated_storage  = 100
   engine                 = "mysql"
   engine_version         = "8.0"
-  instance_class         = "db.t2.micro"
+  instance_class         = "db.t3.micro"
   username               = "admin"
   password               = "password"
   parameter_group_name   = "default.mysql8.0"
