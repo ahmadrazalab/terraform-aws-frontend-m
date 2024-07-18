@@ -12,7 +12,7 @@ variable "instance_type" {
 
 variable "vpc_id" {
   default     = "vpc-0383716a205757a78"
-  description = "The VPC ID"
+  description = "The Default VPC ID"
 }
 
 variable "subnet_ids" {

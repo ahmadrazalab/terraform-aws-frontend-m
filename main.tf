@@ -1,7 +1,7 @@
 # aws key pair
 resource "aws_key_pair" "api-key-aws" {
   key_name   = "api-key-aws"
-  public_key = id_rsa.pub
+  public_key = "./resources/id_rsa.pub"
 }
 
 
@@ -93,10 +93,10 @@ resource "aws_instance" "app" {
   count           = 1
   ami             = var.ami_id
   instance_type   = var.instance_type
-  key_name        = aws_key_pair.api-key-aws.api-key-aws
+  key_name        = aws_key_pair.api-key-aws.key_name
   subnet_id       = element(var.subnet_ids, count.index % length(var.subnet_ids))
   security_groups = [aws_security_group.ec2_sg.id]
-  user_data = file("./user-data.sh")    # user data file
+  user_data = file("./resources/user-data.sh")    # user data file
 
   tags = {
     Name = "app-primary-instance-${count.index + 1}"
@@ -106,10 +106,10 @@ resource "aws_instance" "app" {
 resource "aws_instance" "tg2" {
   ami             = var.ami_id
   instance_type   = var.instance_type
-  key_name        = aws_key_pair.api-key-aws.api-key-aws
+  key_name        = aws_key_pair.api-key-aws.key_name
   subnet_id       = element(var.subnet_ids, 0)
   security_groups = [aws_security_group.ec2_sg.id]
-  user_data = file("./user-data.sh")    # user data file
+  user_data = file("./resources/user-data.sh")    # user data file
 
   tags = {
     Name = "app-seconday-instance-tg2"
@@ -214,7 +214,7 @@ resource "aws_lb_target_group_attachment" "tg1_attachment" {
 
 resource "aws_lb_target_group_attachment" "tg2_attachment" {
   target_group_arn = aws_lb_target_group.tg2.arn
-  target_id        = aws_instance.app_tg2.id
+  target_id        = aws_instance.tg2.id
   port             = 80
 }
 
@@ -264,7 +264,7 @@ resource "aws_db_instance" "default" {
   max_allocated_storage  = 100
   engine                 = "mysql"
   engine_version         = "8.0"
-  instance_class         = "db.t3.micro"
+  instance_class         = "db.t2.micro"
   username               = "admin"
   password               = "password"
   parameter_group_name   = "default.mysql8.0"
