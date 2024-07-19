@@ -6,38 +6,29 @@ echo "<h1> Thanks To Visit </h1>" >> /var/www/html/index.html
 
 
 
+# setting up a php based application server 
+sudo apt install net-tools -y 
+timedatectl set-timezone Asia/Kolkata
+
+# install php setup 
+sudo apt update -y 
+sudo apt upgrade -y 
+# install php 8.1
+sudo apt install software-properties-common -y 
+sudo add-apt-repository ppa:ondrej/php
+sudo apt update -y 
+sudo apt install php8.2 -y 
+sudo apt update -y  
+sudo apt-get install -y  php8.2-fpm php8.2-cli php8.2-common php8.2-json php8.2-opcache php8.2-mysql php8.2-mbstring php8.2-xml php8.2-gd php8.2-curl
+sudo systemctl restart php8.2-fpm
+sudo apt install composer -y 
+sudo snap install --classic certbot -y 
 
 
-# #!/bin/bash
-# # Update and install Apache and PHP
-# sudo apt-get update -y
-# sudo apt-get install -y apache2 php libapache2-mod-php
 
-# # Create the directory for the webpage
-# sudo mkdir -p /var/www/html
+# cloning the repository to the server nginx path 
 
-# # Create the db_check.php file
-# cat << 'EOF' > /var/www/html/db_check.php
-# <?php
-# $servername = "your_db_server";
-# $username = "your_db_username";
-# $password = "your_db_password";
-# $dbname = "your_db_name";
+# composer install 
+# .env update 
 
-# // Create connection
-# $conn = new mysqli($servername, $username, $password, $dbname);
 
-# // Check connection
-# if ($conn->connect_error) {
-#     die("Connection failed: " . $conn->connect_error);
-# } 
-# echo "Connected successfully";
-# ?>
-# EOF
-
-# # Set permissions
-# sudo chown -R www-data:www-data /var/www/html
-# sudo chmod -R 755 /var/www/html
-
-# # Restart Apache to apply changes
-# sudo systemctl restart apache2

@@ -4,8 +4,8 @@ resource "aws_key_pair" "api-key-aws" {
   public_key = file("./resources/id_rsa.pub")
 }
 
-
 # Create Security Groups
+##############################################################################################################################################################
 resource "aws_security_group" "alb_sg" {
   name        = "alb_sg"
   description = "Security group for ALB"
@@ -31,6 +31,10 @@ resource "aws_security_group" "alb_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 }
 
 resource "aws_security_group" "ec2_sg" {
@@ -42,7 +46,7 @@ resource "aws_security_group" "ec2_sg" {
     from_port       = 22
     to_port         = 22
     protocol        = "tcp"
-    security_groups = [aws_security_group.alb_sg.id]
+    cidr_blocks     = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -66,6 +70,10 @@ resource "aws_security_group" "ec2_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 }
 
 resource "aws_security_group" "rds_sg" {
@@ -86,37 +94,51 @@ resource "aws_security_group" "rds_sg" {
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
+
 }
 
 # Create EC2 instances
-resource "aws_instance" "app" {
-  count           = 1
-  ami             = var.ami_id
-  instance_type   = var.instance_type
-  key_name        = aws_key_pair.api-key-aws.key_name
-  subnet_id       = element(var.subnet_ids, count.index % length(var.subnet_ids))
-  security_groups = [aws_security_group.ec2_sg.id]
-  user_data = file("./resources/user-data.sh")    # user data file
+##############################################################################################################################################################
+# resource "aws_instance" "app" {
+#   count           = 1
+#   ami             = var.ami_id
+#   instance_type   = var.instance_type
+#   key_name        = aws_key_pair.api-key-aws.key_name
+#   subnet_id       = element(var.subnet_ids, count.index % length(var.subnet_ids))
+#   security_groups = [aws_security_group.ec2_sg.id]
+#   user_data = file("./resources/user-data.sh")    # user data file
 
-  tags = {
-    Name = "app-primary-instance-${count.index + 1}"
-  }
-}
+#   tags = {
+#     Name = "app-primary-instance-${count.index + 1}"
+#   }
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+# }
 
-resource "aws_instance" "tg2" {
-  ami             = var.ami_id
-  instance_type   = var.instance_type
-  key_name        = aws_key_pair.api-key-aws.key_name
-  subnet_id       = element(var.subnet_ids, 0)
-  security_groups = [aws_security_group.ec2_sg.id]
-  user_data = file("./resources/user-data.sh")    # user data file
+# resource "aws_instance" "tg2" {
+#   ami             = var.ami_id
+#   instance_type   = var.instance_type
+#   key_name        = aws_key_pair.api-key-aws.key_name
+#   subnet_id       = element(var.subnet_ids, 0)
+#   security_groups = [aws_security_group.ec2_sg.id]
+#   user_data = file("./resources/user-data.sh")    # user data file
 
-  tags = {
-    Name = "app-seconday-instance-tg2"
-  }
-}
+#   tags = {
+#     Name = "app-seconday-instance-tg2"
+#   }
+#   lifecycle {
+#     create_before_destroy = true
+#   }
+
+# }
 
 # Create ALB
+##############################################################################################################################################################
 resource "aws_lb" "app_lb" {
   name               = "app-lb"
   internal           = false
@@ -125,6 +147,10 @@ resource "aws_lb" "app_lb" {
   subnets            = var.subnet_ids
 
   enable_deletion_protection = false
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
+
 }
 
 resource "aws_lb_target_group" "tg1" {
@@ -143,6 +169,10 @@ resource "aws_lb_target_group" "tg1" {
     interval            = 30
     matcher             = "200-399"
   }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
+  
 }
 
 resource "aws_lb_target_group" "tg2" {
@@ -161,7 +191,27 @@ resource "aws_lb_target_group" "tg2" {
     interval            = 30
     matcher             = "200-399"
   }
+  # lifecycle {
+  #   prevent_destroy = true
+  # }
 }
+
+# listner redirect from http to https as default listner
+# resource "aws_lb_listener" "http" {
+#   load_balancer_arn = aws_lb.app_lb.arn
+#   port              = "80"
+#   protocol          = "HTTP"
+
+#   default_action {
+#     type = "redirect"
+
+#     redirect {
+#       port        = "443"
+#       protocol    = "HTTPS"
+#       status_code = "HTTP_301"
+#     }
+#   }
+# }
 
 resource "aws_lb_listener" "http" {
   load_balancer_arn = aws_lb.app_lb.arn
@@ -169,16 +219,23 @@ resource "aws_lb_listener" "http" {
   protocol          = "HTTP"
 
   default_action {
-    type = "redirect"
+    type = "forward"
 
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
+    forward {
+      target_group {
+        arn    = aws_lb_target_group.tg1.arn
+        weight = 50
+      }
+
+      target_group {
+        arn    = aws_lb_target_group.tg2.arn
+        weight = 50
+      }
     }
   }
 }
 
+## https listner 
 resource "aws_lb_listener" "https" {
   load_balancer_arn = aws_lb.app_lb.arn
   port              = "443"
@@ -204,22 +261,30 @@ resource "aws_lb_listener" "https" {
 }
 
 # Register instances to target groups
-resource "aws_lb_target_group_attachment" "tg1_attachment" {
-  count = length(aws_instance.app)
 
-  target_group_arn = aws_lb_target_group.tg1.arn
-  target_id        = aws_instance.app[count.index].id
-  port             = 80
-}
+# resource "aws_lb_target_group_attachment" "tg1_attachment" {
+#   count = length(aws_instance.app)
 
-resource "aws_lb_target_group_attachment" "tg2_attachment" {
-  target_group_arn = aws_lb_target_group.tg2.arn
-  target_id        = aws_instance.tg2.id
-  port             = 80
-}
+#   target_group_arn = aws_lb_target_group.tg1.arn
+#   target_id        = aws_instance.app[count.index].id
+#   port             = 80
+#   lifecycle {
+#     ignore_changes = [target_id]
+#   }
+# }
+
+# resource "aws_lb_target_group_attachment" "tg2_attachment" {
+#   target_group_arn = aws_lb_target_group.tg2.arn
+#   target_id        = aws_instance.tg2.id
+#   port             = 80
+#   lifecycle {
+#     ignore_changes = [target_id]
+#   }
+# }
 
 
 # Create launch template for application instances ami 
+##############################################################################################################################################################
 resource "aws_launch_template" "lt" {
   name                 = "app-nest-l-template"
   image_id             = var.ami_id
@@ -227,14 +292,15 @@ resource "aws_launch_template" "lt" {
   vpc_security_group_ids = [ aws_security_group.ec2_sg.id ]
   key_name             = "api-key-aws"
 
-  lifecycle {
-    create_before_destroy = true
-  }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 }
 
 
 
 # Create Auto Scaling Group for tg1
+##############################################################################################################################################################
 resource "aws_autoscaling_group" "asg" {
   name = "nest-app-asg"
   desired_capacity    = 1
@@ -252,9 +318,13 @@ resource "aws_autoscaling_group" "asg" {
     value               = "asg-instance"
     propagate_at_launch = true
   }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 }
 
 # mysql database 
+##############################################################################################################################################################
 resource "aws_db_instance" "default" {
   identifier             = "app-db-nest" # Set your DB identifier here
   allocated_storage      = 20
@@ -274,9 +344,11 @@ resource "aws_db_instance" "default" {
   tags = {
     Name = "app-db-nest"
   }
+  # lifecycle {
+  #   create_before_destroy = true
+  # }
 
 }
-
 
 resource "aws_db_subnet_group" "main" {
   name       = "main"
