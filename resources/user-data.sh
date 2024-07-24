@@ -12,6 +12,7 @@ timedatectl set-timezone Asia/Kolkata
 # Install PHP setup
 sudo apt update -y 
 sudo apt upgrade -y 
+
 # Install PHP 8.2
 sudo apt install software-properties-common -y 
 sudo add-apt-repository ppa:ondrej/php -y
@@ -25,6 +26,7 @@ sudo snap install --classic certbot -y
 
 # Cloning the repository to the server nginx path
 sudo apt install git -y 
+
 # Replace GITHUB_TOKEN with your personal access token
 GITHUB_TOKEN="your_personal_access_token"
 REPO_URL="https://$GITHUB_TOKEN@github.com/yourusername/yourrepository.git"
@@ -42,6 +44,7 @@ sudo apt install awscli -y
 aws secretsmanager get-secret-value --secret-id $SECRET_NAME --region $REGION --query SecretString --output text > /var/www/html/yourrepository/.env
 composer install 
 php artisan key:generate
+
 # Change ownership to the web server user
 sudo chown -R www-data:www-data /var/www/html/yourrepository
 sudo chmod -R 777 /var/www/html/yourrepository/storage

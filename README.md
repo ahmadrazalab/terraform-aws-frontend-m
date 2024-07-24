@@ -10,6 +10,12 @@ This document outlines the steps to create the infrastructure for the enterprize
 3. **Setup application**
 4. **Create AMI**
 
+### Magic-application AMI
+1. **Create an instance**
+2. **Install dependencies**
+3. **Setup application**
+4. **Create AMI**
+
 ### Backend-application AMI
 1. **Create an instance**
 2. **Install dependencies**
@@ -31,7 +37,7 @@ This document outlines the steps to create the infrastructure for the enterprize
 ## 4. EC2 Instances
 
 ### Create EC2 Instances from AMI
-- Launch 3 instances from the frontend and backend AMIs.
+- Launch 2 instances from the magic and frontend AMIs.
 
 ## 5. Security Groups
 
@@ -99,3 +105,9 @@ This document outlines the steps to create the infrastructure for the enterprize
 
 > This setup will provision a fully functional infrastructure for the enterprize-tf-lab project using Terraform, ensuring scalability, security, and manageability.
 
+
+
+
+# ResourcesRequirements:
+- ec2-ami (dashboard, checkout, backend, landing page, magicCheckout, Hooks, Cron)
+- 
