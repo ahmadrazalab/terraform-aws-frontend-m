@@ -1,5 +1,5 @@
 
-# Variables
+# Variables of N.virginia.US
 variable "ami_id" {
   default     = "ami-0a0e5d9c7acc336f1"
   description = "The AMI ID for the EC2 instances"
