@@ -20,3 +20,9 @@ variable "subnet_ids" {
   type        = list(string)
   default     = ["subnet-088b163111abca9e8", "subnet-014c505f127ee9a23", "subnet-0f40021676c987d5e", "subnet-0e2a5c6f1397b1ab0", "subnet-0f879dd6e0b9508d2", "subnet-078dd16ae97c3a3ec"]
 }
+
+# tf wars variables
+variable "certificate_arn" {
+  description = "The ARN of the ACM certificate to use for the HTTPS listener"
+  type        = string
+}
