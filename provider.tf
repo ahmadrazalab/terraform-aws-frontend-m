@@ -1,3 +1,13 @@
+terraform {
+  cloud {
+    organization = "devops-aws-tf"
+
+    workspaces {
+      name = "deploy-init-enterprize-tf-lab"
+    }
+  }
+}
+
 # # provider find the creds in aws cli dir with the vesion specific terraform 
 # terraform {
 #   required_version = "v1.9.2"
