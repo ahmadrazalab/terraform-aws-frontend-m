@@ -9,9 +9,6 @@ resource "aws_lb" "app_lb" {
   subnets            = var.subnet_ids
 
   enable_deletion_protection = false
-  # lifecycle {
-  #   prevent_destroy = true
-  # }
 
 }
 
