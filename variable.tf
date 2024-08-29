@@ -7,7 +7,7 @@ variable "ami_id" {
 
 variable "instance_type" {
   description = "The instance type for the EC2 instances"
-  default     = "t2.micro"
+  default     = "t3a.small"
 }
 
 variable "vpc_id" {

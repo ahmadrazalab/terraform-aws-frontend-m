@@ -27,12 +27,12 @@ resource "aws_security_group" "ec2_sg" {
     security_groups = [aws_security_group.alb_sg.id]
   }
 
-  ingress {
-    from_port       = 3306
-    to_port         = 3306
-    protocol        = "tcp"
-    security_groups = [aws_security_group.rds_sg.id]
-  }
+  # ingress {
+  #   from_port       = 3306
+  #   to_port         = 3306
+  #   protocol        = "tcp"
+  #   security_groups = [aws_security_group.rds_sg.id]
+  # }
 
   egress {
     from_port   = 0
@@ -67,7 +67,6 @@ resource "aws_security_group" "rds_sg" {
 
 
 
-# SG for alb which allow traffic from only cloudflare IPS 
 # SG for ALB which allows traffic from only Cloudflare IPs
 resource "aws_security_group" "alb_sg" {
   name        = "alb_sg"

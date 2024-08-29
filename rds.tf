@@ -20,10 +20,6 @@ resource "aws_db_instance" "default" {
   tags = {
     Name = "app-db-nest"
   }
-  # lifecycle {
-  #   create_before_destroy = true
-  # }
-
 }
 
 resource "aws_db_subnet_group" "main" {
