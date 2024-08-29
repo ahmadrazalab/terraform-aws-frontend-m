@@ -32,10 +32,7 @@ resource "aws_lb_target_group" "tg1" {
     interval            = 30
     matcher             = "200-399"
   }
-  # lifecycle {
-  #   prevent_destroy = true
-  # }
-  
+
 }
 
 
@@ -56,9 +53,6 @@ resource "aws_lb_target_group" "tg2" {
     interval            = 30
     matcher             = "200-399"
   }
-  # lifecycle {
-  #   prevent_destroy = true
-  # }
 }
 
 # HTTP-80 > listner1 redirect from http to https as default listner

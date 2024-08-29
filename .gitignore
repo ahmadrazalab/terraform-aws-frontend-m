@@ -1,6 +1,8 @@
 # Terraform state files
 *.tfstate
 *.tfstate.*
+infra-resources.sh
+
 
 # Terraform plan files
 *.tfplan

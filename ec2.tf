@@ -1,6 +1,10 @@
 
 ## Create EC2 instances
 ##############################################################################################################################################################
+
+
+# below is the EC2 of PP ec2 instances of PP-TG primary
+
 resource "aws_instance" "app" {
   count           = 1
   ami             = var.ami_id
@@ -18,6 +22,10 @@ resource "aws_instance" "app" {
   }
 }
 
+
+
+
+# below is the EC2 of primart ec2 instances of PROD-TG primary
 resource "aws_instance" "tg2" {
   ami             = var.ami_id
   instance_type   = var.instance_type
@@ -27,7 +35,7 @@ resource "aws_instance" "tg2" {
   user_data = file("./resources/user-data.sh")    # user data file
 
   tags = {
-    Name = "app-seconday-instance-tg2"
+    Name = "app-PP-instance-tg2"
   }
   lifecycle {
     create_before_destroy = true
