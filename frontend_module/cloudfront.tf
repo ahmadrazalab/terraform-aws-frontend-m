@@ -1,5 +1,3 @@
-
-
 # cloudfront.tf
 resource "aws_cloudfront_distribution" "website_distribution" {
   origin {
@@ -44,9 +42,6 @@ resource "aws_cloudfront_distribution" "website_distribution" {
     }
   }
 
-  # viewer_certificate {
-  #   cloudfront_default_certificate = true
-  # }
 
   viewer_certificate {
     acm_certificate_arn      = "arn:aws:acm:us-east-1:767397928888:certificate/593d3237-3478-407c-87f4-02dec93d7f08"
