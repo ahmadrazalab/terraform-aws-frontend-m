@@ -1,6 +1,13 @@
-# main.tf in the root directory
 module "frontend" {
   source = "./frontend_module"
-  # Add any required variables
-  # e.g., bucket_name = var.bucket_name
 }
+
+
+
+module "backend" {
+  source          = "./backend_module"
+  certificate_arn = "arn:aws:acm:ap-south-1:767397928888:certificate/605b7a5c-1422-4ac4-a2d4-e5b1b5d0b754"
+}
+
+
+

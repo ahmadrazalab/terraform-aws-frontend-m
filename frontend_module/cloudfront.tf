@@ -7,7 +7,7 @@ resource "aws_cloudfront_distribution" "website_distribution" {
     s3_origin_config {
       origin_access_identity = aws_cloudfront_origin_access_identity.oai.cloudfront_access_identity_path
     }
-    origin_path = "/dist"  # Set this to the folder containing your static files
+    origin_path = "/dist" # Set this to the folder containing your static files
   }
 
   enabled             = true
