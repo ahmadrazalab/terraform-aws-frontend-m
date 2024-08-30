@@ -34,7 +34,7 @@ resource "aws_db_subnet_group" "main" {
 
 # Read Replica of the primary MySQL RDS instance in the same region
 resource "aws_db_instance" "read_replica" {
-  identifier              = "app-db-nest-replica"
+  identifier              = "app-db-replica"
   replicate_source_db     = aws_db_instance.default.identifier
   instance_class          = "db.t3.micro"
   publicly_accessible     = false
