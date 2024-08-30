@@ -6,10 +6,10 @@ resource "aws_security_group" "ec2_sg" {
   vpc_id      = var.vpc_id
 
   ingress {
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    cidr_blocks     = ["0.0.0.0/0"]
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
@@ -75,9 +75,9 @@ resource "aws_security_group" "alb_sg" {
 
   # Allow HTTP traffic (port 80) from Cloudflare IPv4 ranges
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
     cidr_blocks = [
       "103.21.244.0/22",
       "103.22.200.0/22",
@@ -99,9 +99,9 @@ resource "aws_security_group" "alb_sg" {
 
   # Allow HTTP traffic (port 80) from Cloudflare IPv6 ranges
   ingress {
-    from_port   = 80
-    to_port     = 80
-    protocol    = "tcp"
+    from_port = 80
+    to_port   = 80
+    protocol  = "tcp"
     ipv6_cidr_blocks = [
       "2400:cb00::/32",
       "2606:4700::/32",
@@ -115,9 +115,9 @@ resource "aws_security_group" "alb_sg" {
 
   # Allow HTTPS traffic (port 443) from Cloudflare IPv4 ranges
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
     cidr_blocks = [
       "103.21.244.0/22",
       "103.22.200.0/22",
@@ -139,9 +139,9 @@ resource "aws_security_group" "alb_sg" {
 
   # Allow HTTPS traffic (port 443) from Cloudflare IPv6 ranges
   ingress {
-    from_port   = 443
-    to_port     = 443
-    protocol    = "tcp"
+    from_port = 443
+    to_port   = 443
+    protocol  = "tcp"
     ipv6_cidr_blocks = [
       "2400:cb00::/32",
       "2606:4700::/32",

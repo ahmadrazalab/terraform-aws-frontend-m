@@ -1,19 +1,19 @@
-terraform { 
-  cloud { 
-    
-    organization = "devops-aws-tf" 
+terraform {
+  cloud {
 
-    workspaces { 
-      name = "deploy-init-enterprize-tf-lab" 
-    } 
-  } 
+    organization = "devops-aws-tf"
+
+    workspaces {
+      name = "deploy-init-enterprize-tf-lab"
+    }
+  }
 }
 
 
 terraform {
   required_providers {
     aws = {
-      source = "hashicorp/aws"
+      source  = "hashicorp/aws"
       version = "5.64.0"
     }
   }

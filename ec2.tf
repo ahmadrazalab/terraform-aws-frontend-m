@@ -27,7 +27,7 @@ resource "aws_instance" "tg2" {
   key_name        = aws_key_pair.api-key-aws.key_name
   subnet_id       = element(var.subnet_ids, 0)
   security_groups = [aws_security_group.ec2_sg.id]
-  user_data = file("./resources/user-data.sh")    # user data file
+  user_data       = file("./resources/user-data.sh") # user data file
 
   tags = {
     Name = "app-PP-instance-tg2"
