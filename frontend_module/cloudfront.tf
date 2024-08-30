@@ -14,7 +14,7 @@ resource "aws_cloudfront_distribution" "website_distribution" {
   enabled             = true
   is_ipv6_enabled     = true
   comment             = "CloudFront Distribution for S3 Static Website"
-  default_root_object = "index.html" # change according to application configuration 
+  default_root_object = "dist/index.html" # change according to application configuration 
 
 
   aliases = ["dash.kubecloud.in.net"]
@@ -48,7 +48,7 @@ resource "aws_cloudfront_distribution" "website_distribution" {
   # }
 
   viewer_certificate {
-    acm_certificate_arn      = var.certificate_arn
+    acm_certificate_arn      = "arn:aws:acm:us-east-1:767397928888:certificate/593d3237-3478-407c-87f4-02dec93d7f08"
     ssl_support_method       = "sni-only"
     minimum_protocol_version = "TLSv1.2_2021"
   }

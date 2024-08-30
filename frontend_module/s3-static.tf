@@ -5,8 +5,6 @@ variable "bucket_name" {
   default     = "s3-static-site-paytring" # Change as needed
 }
 
-
-
 # # Create an S3 bucket
 resource "aws_s3_bucket" "s3-static-site-paytring" {
   bucket = var.bucket_name
