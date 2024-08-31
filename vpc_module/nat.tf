@@ -1,4 +1,4 @@
-# NAT Gateway or NAT Instance: For instances in private subnets that need to access the internet for updates, a NAT Gateway is needed. This NAT Gateway is usually placed in one of the public subnets.
+#NAT Gateway or NAT Instance: For instances in private subnets that need to access the internet for updates, a NAT Gateway is needed. This NAT Gateway is usually placed in one of the public subnets.
 # Create a NAT Gateway in one of the public subnets.
 
 # Create NAT Gateway in a Public Subnet
