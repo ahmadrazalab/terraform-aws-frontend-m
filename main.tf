@@ -11,3 +11,6 @@ module "backend" {
 
 
 
+module "vpc" {
+  source = "./vpc_module"
+}
