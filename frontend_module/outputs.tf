@@ -1,7 +1,19 @@
 # outputs.tf
 output "cloudfront_domain_name" {
   description = "The domain name of the CloudFront distribution"
-  value       = aws_cloudfront_distribution.website_distribution.domain_name
+  value       = aws_cloudfront_distribution.dashboard_distribution.domain_name
+}
+
+
+output "cloudfront_domain_name" {
+  description = "The domain name of the CloudFront distribution"
+  value       = aws_cloudfront_distribution.cdn_distribution.domain_name
+}
+
+
+output "cloudfront_domain_name" {
+  description = "The domain name of the CloudFront distribution"
+  value       = aws_cloudfront_distribution.checkout_distribution.domain_name
 }
 
 output "s3_bucket_name" {
