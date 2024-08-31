@@ -1,7 +1,9 @@
 ## issue 
-segregate outputs of data
+segregate outputs of data in single file for each module 
 setup terrafrom.tfvars for variable substitution
-backend as module 
+naming convention should me proper 
+
+
 
 
 
@@ -9,4 +11,3 @@ backend as module
 - read replica rds 
 - implement Secret Manager 
 - access RDS, secretM, S3 using IAM role by ec2 instance 
-- setup custom VPC with Private Subnet Setup 
