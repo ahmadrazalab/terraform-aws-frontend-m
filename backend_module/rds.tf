@@ -2,7 +2,7 @@
 # RDS mysql database 
 ##############################################################################################################################################################
 resource "aws_db_instance" "default" {
-  identifier             = "app-db-nest" # Set your DB identifier here
+  identifier             = "app-db" # Set your DB identifier here
   allocated_storage      = 20
   max_allocated_storage  = 100
   engine                 = "mysql"
