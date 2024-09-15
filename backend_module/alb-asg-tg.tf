@@ -1,9 +1,9 @@
 
 # Create ALB
 ##############################################################################################################################################################
-resource "aws_lb" "app_lb" {
-  name               = "app-lb"
-  internal           = false
+resource "aws_lb" "prod_app_lb" {
+  name               = "${var.environment}-${var.company_name}-app-lb"
+  internal           = var.lb_internal
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
   subnets            = var.subnet_ids
@@ -14,9 +14,9 @@ resource "aws_lb" "app_lb" {
 
 
 # TG1-Primary for ALB
-resource "aws_lb_target_group" "tg1" {
-  name     = "app-tg1"
-  port     = 80
+resource "aws_lb_target_group" "primary_tg" {
+  name     = "${var.environment}-${var.company_name}-primary-tg"
+  port     = var.app_port
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 
@@ -35,9 +35,9 @@ resource "aws_lb_target_group" "tg1" {
 
 
 # TG2-Secondary for ALB
-resource "aws_lb_target_group" "tg2" {
-  name     = "app-tg2"
-  port     = 80
+resource "aws_lb_target_group" "secondary_tg" {
+  name     = "${var.environment}-${var.company_name}-secondary-tg"
+  port     = var.app_port
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 
@@ -205,9 +205,9 @@ locals {
 
 # Create launch template for application instances ami 
 ##############################################################################################################################################################
-resource "aws_launch_template" "lt" {
-  name          = "app-nest-l-template"
-  image_id      = var.ami_id # change this to the ami created from the ec2 user data scripts
+resource "aws_launch_template" "app_launch_template" {
+  name          = "${var.environment}-${var.company_name}-app-launch-template"
+  image_id      = var.ami_id
   instance_type = var.instance_type
   # Include user_data in the launch template
   user_data              = base64encode(local.user_data)
@@ -220,15 +220,15 @@ resource "aws_launch_template" "lt" {
 
 # Create Auto Scaling Group for tg1
 ##############################################################################################################################################################
-resource "aws_autoscaling_group" "asg" {
-  name                = "pt-b-app-asg"
-  desired_capacity    = 1
-  max_size            = 2
-  min_size            = 1
+resource "aws_autoscaling_group" "app_asg" {
+  name                = "${var.environment}-${var.company_name}-app-asg"
+  desired_capacity    = var.asg_desired_capacity
+  max_size            = var.asg_max_size
+  min_size            = var.asg_min_size
   vpc_zone_identifier = var.subnet_ids
-  target_group_arns   = [aws_lb_target_group.tg1.arn]
+  target_group_arns   = [aws_lb_target_group.primary_tg.arn]
   launch_template {
-    id      = aws_launch_template.lt.id
+    id      = aws_launch_template.app_launch_template.id
     version = "$Latest"
   }
 
