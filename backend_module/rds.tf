@@ -15,7 +15,7 @@ resource "aws_db_instance" "primary_db" {
   publicly_accessible    = false
   deletion_protection    = false # normally its true
   # setup automateed backups rentention for 1 days
-  backup_retention_period = 7
+  backup_retention_period = 7 # required fo rread replica 
   vpc_security_group_ids = [aws_security_group.rds_sg.id]
   db_subnet_group_name   = aws_db_subnet_group.db_subnet_group.name
 
