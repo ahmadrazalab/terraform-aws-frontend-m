@@ -55,7 +55,7 @@ resource "aws_lb_target_group" "secondary_tg" {
 
 # HTTP-80 > listner1 redirect from http to https as default listner
 resource "aws_lb_listener" "http" {
-  load_balancer_arn = aws_lb.app_lb.arn
+  load_balancer_arn = aws_lb.prod_app_lb.arn
   port              = "80"
   protocol          = "HTTP"
 
@@ -124,7 +124,7 @@ resource "aws_lb_listener" "http" {
 
 # HTTPS-443 > listner2 redirect traffic to tg1 and tg2 50/50
 resource "aws_lb_listener" "https" {
-  load_balancer_arn = aws_lb.app_lb.arn
+  load_balancer_arn = aws_lb.prod_app_lb.arn
   port              = "443"
   protocol          = "HTTPS"
   ssl_policy        = "ELBSecurityPolicy-2016-08"
@@ -135,12 +135,12 @@ resource "aws_lb_listener" "https" {
 
     forward {
       target_group {
-        arn    = aws_lb_target_group.tg1.arn
+        arn    = aws_lb_target_group.primary_tg.arn
         weight = 1
       }
 
       target_group {
-        arn    = aws_lb_target_group.tg2.arn
+        arn    = aws_lb_target_group.secondary_tg.arn
         weight = 0
       }
     }
@@ -155,7 +155,7 @@ resource "aws_lb_listener_rule" "https_header_rule" {
 
   action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.tg2.arn # Target group to forward traffic to
+    target_group_arn = aws_lb_target_group.primary_tg.arn # Target group to forward traffic to
   }
 
   condition {

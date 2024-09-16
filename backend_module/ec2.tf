@@ -24,7 +24,7 @@
 resource "aws_instance" "secondary_instance" {
   ami             = var.ami_id
   instance_type   = var.instance_type
-  key_name        = aws_key_pair.api-key-aws.key_name
+  key_name        = aws_key_pair.terraform-key.key_name
   subnet_id       = element(var.subnet_ids, 0)
   security_groups = [aws_security_group.ec2_sg.id]
   user_data       = file(var.user_data_script_path)

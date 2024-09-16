@@ -4,7 +4,7 @@ resource "aws_acm_certificate" "prod_cert" {
   validation_method = "DNS"
 
   tags = {
-    Name = "Wildcard Certificate for ahmadraza.in"
+    Name        = "Wildcard Certificate for ahmadraza.in"
     Environment = "production"
   }
 }
