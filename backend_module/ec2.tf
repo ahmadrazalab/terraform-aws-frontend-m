@@ -30,7 +30,7 @@ resource "aws_instance" "secondary_instance" {
   user_data       = file(var.user_data_script_path)
 
   tags = {
-    Name = "${var.environment}-${var.company_name}-secondary-instance"
+    Name = "${var.environment}-${replace(var.company_name, ".", "-")}-secondary-instance"
   }
   lifecycle {
     create_before_destroy = true

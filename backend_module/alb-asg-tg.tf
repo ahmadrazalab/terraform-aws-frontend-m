@@ -2,7 +2,7 @@
 # Create ALB
 ##############################################################################################################################################################
 resource "aws_lb" "prod_app_lb" {
-  name               = "${var.environment}-${var.company_name}-app-lb"
+  name               = "${var.environment}-${replace(var.company_name, ".", "-")}-app-lb"
   internal           = var.lb_internal
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb_sg.id]
@@ -15,7 +15,7 @@ resource "aws_lb" "prod_app_lb" {
 
 # TG1-Primary for ALB
 resource "aws_lb_target_group" "primary_tg" {
-  name     = "${var.environment}-${var.company_name}-primary-tg"
+  name     = "${var.environment}-${replace(var.company_name, ".", "-")}-primary-tg"
   port     = var.app_port
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -36,7 +36,7 @@ resource "aws_lb_target_group" "primary_tg" {
 
 # TG2-Secondary for ALB
 resource "aws_lb_target_group" "secondary_tg" {
-  name     = "${var.environment}-${var.company_name}-secondary-tg"
+  name     = "${var.environment}-${replace(var.company_name, ".", "-")}-secondary-tg"
   port     = var.app_port
   protocol = "HTTP"
   vpc_id   = var.vpc_id
@@ -206,13 +206,13 @@ locals {
 # Create launch template for application instances ami 
 ##############################################################################################################################################################
 resource "aws_launch_template" "app_launch_template" {
-  name          = "${var.environment}-${var.company_name}-app-launch-template"
+  name          = "${var.environment}-${replace(var.company_name, ".", "-")}-app-launch-template"
   image_id      = var.ami_id
   instance_type = var.instance_type
   # Include user_data in the launch template
   user_data              = base64encode(local.user_data)
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
-  key_name               = "api-key-aws"
+  key_name               = "terraform-key"
 
 }
 
@@ -221,7 +221,7 @@ resource "aws_launch_template" "app_launch_template" {
 # Create Auto Scaling Group for tg1
 ##############################################################################################################################################################
 resource "aws_autoscaling_group" "app_asg" {
-  name                = "${var.environment}-${var.company_name}-app-asg"
+  name                = "${var.environment}-${replace(var.company_name, ".", "-")}-app-asg"
   desired_capacity    = var.asg_desired_capacity
   max_size            = var.asg_max_size
   min_size            = var.asg_min_size
