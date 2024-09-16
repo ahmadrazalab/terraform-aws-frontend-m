@@ -23,7 +23,7 @@
 # below is the EC2 of primart ec2 instances of PROD-TG primary
 resource "aws_instance" "secondary_instance" {
   ami             = var.ami_id
-  instance_type   = var.instance_type
+  instance_type   = "t3a.small"
   key_name        = aws_key_pair.terraform-key.key_name
   subnet_id       = element(var.subnet_ids, 0)
   security_groups = [aws_security_group.ec2_sg.id]
@@ -31,9 +31,6 @@ resource "aws_instance" "secondary_instance" {
 
   tags = {
     Name = "${var.environment}-${replace(var.company_name, ".", "-")}-secondary-instance"
-  }
-  lifecycle {
-    create_before_destroy = true
   }
 
 }
