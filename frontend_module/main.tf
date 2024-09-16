@@ -1,6 +1,6 @@
 # main.tf
 resource "aws_s3_bucket" "prod_static_site" {
-  bucket = "${var.environment}-${var.static_site_bucket_name}"
+  bucket = var.static_site_bucket_name
 
   tags = merge(
     {
@@ -30,7 +30,7 @@ resource "aws_s3_bucket_policy" "prod_static_site_policy" {
 }
 
 resource "aws_cloudfront_origin_access_identity" "prod_oai" {
-  comment = "OAI for ${var.static_site_bucket_name}"
+  comment = "OAI for static site bucket"
 }
 
 module "cdn_distribution" {
@@ -50,6 +50,8 @@ module "cdn_distribution" {
   min_ttl                     = var.cloudfront_min_ttl
   default_ttl                 = var.cloudfront_default_ttl
   max_ttl                     = var.cloudfront_max_ttl
+  aws_acm_certificate_us      = var.aws_acm_cetificate_us
+
 }
 
 module "checkout_distribution" {
@@ -69,6 +71,8 @@ module "checkout_distribution" {
   min_ttl                     = var.cloudfront_min_ttl
   default_ttl                 = var.cloudfront_default_ttl
   max_ttl                     = var.cloudfront_max_ttl
+  aws_acm_certificate_us      = var.aws_acm_cetificate_us
+
 }
 
 module "dashboard_distribution" {
@@ -88,4 +92,6 @@ module "dashboard_distribution" {
   min_ttl                     = var.cloudfront_min_ttl
   default_ttl                 = var.cloudfront_default_ttl
   max_ttl                     = var.cloudfront_max_ttl
+  aws_acm_certificate_us      = var.aws_acm_cetificate_us
+
 }

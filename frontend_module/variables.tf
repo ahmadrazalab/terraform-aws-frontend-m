@@ -1,4 +1,9 @@
 # variables.tf
+variable "aws_acm_cetificate_us" {
+  description = "ACM SSL Certificate"
+  type        = string
+}
+
 
 variable "company_name" {
   description = "The name of the company"

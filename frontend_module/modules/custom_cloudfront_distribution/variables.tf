@@ -1,4 +1,10 @@
+
 # modules/custom_cloudfront_distribution/variables.tf
+variable "aws_acm_certificate_us" {
+  description = "ACM SSL Certificate"
+  type        = string
+}
+
 variable "bucket_regional_domain_name" {
   description = "The regional domain name of the S3 bucket"
   type        = string
