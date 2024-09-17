@@ -1,14 +1,14 @@
 # Using Terraform Cloud to manage terraform running using workspaces 
-# terraform {
-#   cloud {
+terraform { 
+  cloud { 
+    
+    organization = "devops-aws-tf" 
 
-#     organization = "devops-aws-tf"
-
-#     workspaces {
-#       name = "deploy-init-enterprize-tf-lab"
-#     }
-#   }
-# }
+    workspaces { 
+      name = "vpc_module" 
+    } 
+  } 
+}
 
 
 terraform {
