@@ -1,113 +1,87 @@
-# Enterprize-tf-lab Terraform Setup
+# Terraform AWS CloudFront Distribution
 
-This document outlines the steps to create the infrastructure for the enterprize-tf-lab project using Terraform.
+This project uses Terraform to set up and manage AWS CloudFront distributions for a static website, checkout process, and other custom distributions on Amazon S3.
 
-## 1. AMI Creation
+## Project Structure
 
-### Frontend-application AMI
-1. **Create an instance**
-2. **Install dependencies**
-3. **Setup application**
-4. **Create AMI**
+- `main.tf`: Main Terraform configuration file
+- `variables.tf`: Input variables for the Terraform configuration
+- `outputs.tf`: Output values from the Terraform configuration
+- `providers.tf`: Provider configuration for AWS
+- `modules/`: Custom Terraform modules
+  - `cloudfront_distribution/`: Standard CloudFront distribution module
+  - `custom_cloudfront_distribution/`: Customizable CloudFront distribution module
 
-### Magic-application AMI
-1. **Create an instance**
-2. **Install dependencies**
-3. **Setup application**
-4. **Create AMI**
+## Requirements
 
-### Backend-application AMI
-1. **Create an instance**
-2. **Install dependencies**
-3. **Setup application**
-4. **Create AMI**
+- Terraform v0.12+
+- AWS CLI configured with appropriate credentials
+- An Amazon S3 bucket to host your static website content
 
-## 2. Keypair
+## Usage
 
-### Create a Keypair
-- Generate a keypair for EC2 instances.
+1. Clone this repository
+2. Update the `variables.tf` file with your desired values
+3. Run `terraform init` to initialize the Terraform working directory
+4. Run `terraform plan` to see the execution plan
+5. Run `terraform apply` to create the resources
+6. After the resources are created, upload your static website content to the S3 bucket
 
-## 3. IAM Users and Policies
+## Variables
 
-### Create IAM Users
-1. **data-s3-keys**: Permissions: `put`, `get`
-2. **logs-s3-keys**: Permissions: `put`, `get`
-3. **uat-s3-keys**: Permissions: `put`, `get`, `delete`
+Key variables include:
 
-## 4. EC2 Instances
+- `static_site_bucket_name`: Name of the S3 bucket for the static site
+- `environment`: Environment name (e.g., prod, dev, staging)
+- `cloudfront_price_class`: CloudFront distribution price class
+- `cloudfront_allowed_methods`: HTTP methods that CloudFront processes and forwards
+- `cloudfront_cached_methods`: HTTP methods for which CloudFront caches responses
+- `cloudfront_min_ttl`: Minimum time for objects to stay in CloudFront caches
+- `cloudfront_default_ttl`: Default time for objects in CloudFront cache
+- `cloudfront_max_ttl`: Maximum time for objects in CloudFront cache
 
-### Create EC2 Instances from AMI
-- Launch 2 instances from the magic and frontend AMIs.
+For a complete list of variables and their descriptions, please refer to the `variables.tf` file.
 
-## 5. Security Groups
+## Modules
 
-### Create Security Groups
-1. **ec2-sg**: Security group for EC2 instances.
-2. **alb-sg**: Security group for the load balancer.
-3. **rds-sg**: Security group for RDS instances.
+### custom_cloudfront_distribution
 
-## 6. Auto Scaling Group and Launch Template
+This module creates a customizable CloudFront distribution. It allows you to specify:
 
-### Create Auto Scaling Group
-- Create a launch template and configure the auto scaling group.
+- Origin domain name
+- Allowed HTTP methods
+- Cached HTTP methods
+- Price class
+- TTL settings (minimum, default, maximum)
+- And more
 
-## 7. Target Groups and Load Balancer
+## Outputs
 
-### Create Target Groups
-- Create 2 target groups for the load balancer.
+- `cdn_distribution_domain`: The domain name of the CDN CloudFront distribution
+- `checkout_distribution_domain`: The domain name of the checkout CloudFront distribution
 
-### Create Load Balancer
-- Setup load balancer with target groups and listener rules.
+Use these domain names to access your CloudFront-distributed content.
 
-## 8. RDS and Read Replica
+## Security
 
-### Setup RDS
-1. **Create RDS instance**
-2. **Create Read Replica**
-3. **Execute queries** to setup 2 databases and create user/password for the application.
-4. **Import databases** from S3 bucket.
+This project uses AWS CloudFront Origin Access Identity (OAI) to secure access to the S3 bucket. Only CloudFront can access the S3 bucket directly.
 
-## 9. S3 Buckets
+## Customization
 
-### Create S3 Buckets
-- Create 3 S3 buckets for different purposes.
+You can customize the CloudFront distributions by modifying the `custom_cloudfront_distribution` module calls in `main.tf`. Adjust the input variables to change behaviors such as allowed methods, TTL settings, and more.
 
-## 10. ACM Certificate
+## License
 
-### Setup ACM Certificate
-- Request and validate an ACM certificate.
+[Specify your license here]
 
-## 11. Custom VPC
+## Contributing
 
-### Create Custom VPC
-1. **Private Subnet**: For RDS instances.
-2. **Public Subnet**: For EC2 instances and load balancer.
+[Add contributing guidelines if applicable]
 
-## 12. Private OpenVPN
+## Support
 
-### Setup Private OpenVPN
-- Create a server in the VPC to connect private resources.
+For support, please open an issue in the GitHub repository or contact [your contact information].
 
-## 13. Secrets Manager
+## Disclaimer
 
-### Setup Secrets Manager
-1. **Git Clone Credentials**: Store and fetch git clone token.
-2. **Database Credentials**: Store and update database username, password, host, and port.
-
-## 14. Outputs
-
-### Terraform Outputs
-1. **Load Balancer Host**: Output the load balancer hostname.
-2. **All Servers IP with Name**: Output the IP addresses of all servers with their names.
-3. **ACM Record**: Output the ACM record to update in DNS.
-
-## Conclusion
-
-> This setup will provision a fully functional infrastructure for the enterprize-tf-lab project using Terraform, ensuring scalability, security, and manageability.
-
-
-
-
-# ResourcesRequirements:
-- ec2-ami (dashboard, checkout, backend, landing page, magicCheckout, Hooks, Cron)
-- 
+This project is provided as-is, without any guarantees or warranty. Users are responsible for ensuring that their use of this code complies with all applicable laws and regulations.

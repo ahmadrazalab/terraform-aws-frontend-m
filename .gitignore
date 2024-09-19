@@ -1,11 +1,8 @@
-infra-resources.sh
-temp_modules
-.vscode
-
 # Terraform state files
 *.tfstate
 *.tfstate.*
-
+infra-resources.sh
+terraform.tfvars
 
 # Terraform plan files
 *.tfplan
