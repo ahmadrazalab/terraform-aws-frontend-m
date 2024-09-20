@@ -1,0 +1,20 @@
+# terraform.tfvars
+company_name            = "example-company"
+environment             = "prod"
+static_site_bucket_name = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+cdn_domain_name         = "cdn.example-company.com"
+checkout_domain_name    = "checkout.example-company.com"
+dashboard_domain_name   = "dashboard.example-company.com"
+# origin_path = "/content"
+# default_root_object = "index.html"
+# price_class = "PriceClass_100"
+additional_tags = {
+  Project = "Frontend"
+}
+cdn_origin_path               = "/cdn"
+cdn_default_root_object       = "index.html"
+checkout_origin_path          = "/checkout"
+checkout_default_root_object  = "index.html"
+dashboard_origin_path         = "/dashboard"
+dashboard_default_root_object = "index.html"
+aws_acm_cetificate_us         = "arn:aws:acm:ap-south-1:467082624023:certificate/63f"
